@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<meta http-equiv="origin-trial" charset="utf-8"/>
+<!--<style>
+.name, .value
+{
+  display:inline;
+}
+</style> -->
+
+
+<title> Compute Pressure Testing</title>
+<section>
+  <H1>Compute Pression Testing</H1>
+  <p id ="CPSupport"> </p>
+  <table id="cpuUtilization">
+    <tr>
+      <th id="name1">CPU Utilization </th>
+      <td id="value1">Unknown</td>
+    </tr>
+    <tr>
+      <th id="name2">CPU Speed </th>
+      <td id="value2">Unknown</td>
+    </tr>
+
+  </table>
+</section>
+<script>
+  if('ComputePressureObserver' in window) {
+    document.getElementById('CPSupport').innerHTML = 'Compute Pressure available';
+    const observer = new ComputePressureObserver(
+      computePressureCallback,
+       {
+         cpuUtilizationThresholds: [0.75, 0.9, 0.5],
+         cpuSpeedThresholds: [0.5],
+    });
+
+    observer.observe();
+
+    function computePressureCallback(update) {
+      console.log("callback: ")
+      console.log("cpuSpeed: " + update.cpuSpeed);
+      console.log("cpuUtilization: " + update.cpuUtilization);
+        
+      // The CPU base clock speed is represented as 0.5.
+      if (update.cpuSpeed >= 0.5) {
+        document.getElementById('value2').innerHTML = "> 0.5";
+        // Dramatically cut down compute requirements to avoid overheating.
+      } else {
+        document.getElementById('value2').innerHTML = "< 0.5";
+      }
+
+      if (update.cpuUtilization >= 0.9) {
+        document.getElementById('value1').innerHTML = "> 0.9";
+      } else if (update.cpuUtilization >= 0.75) {
+        document.getElementById('value1').innerHTML = "> 0.75";
+      } else if (update.cpuUtilization >= 0.5) {
+        document.getElementById('value1').innerHTML = "> 0.5";
+      } else {
+      // The system is in great shape. Show all meeting participants.
+        document.getElementById('value1').innerHTML = "< 0.5";
+      }
+
+      // Options applied are returned with every update.
+      // The options applied may be different than those requested.
+      // e.g. the user agent may have reduced the number of thresholds observed.
+      //console.log(
+      //"Effective CPU utilization thresholds: " +
+      //JSON.stringify(update.options.cpuUtilizationThresholds));
+      //console.log(
+      //"Effective CPU speed thresholds: " +
+      //JSON.stringify(update.options.cpuSpeedThresholds));
+
+    }
+    
+  }else{
+    document.getElementById('CPSupport').innerHTML = 'Compute Pressure NOT available';
+  }
+        
+</script>
